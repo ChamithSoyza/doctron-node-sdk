@@ -1,0 +1,21 @@
+{
+  "name": "docstron-sdk",
+  "version": "0.1.0",
+  "description": "Node.js SDK for Docstron PDF Generation API",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test/test.js"
+  },
+  "keywords": [
+    "pdf",
+    "pdf-generation",
+    "docstron",
+    "api-client",
+    "cmsoyza"
+  ],
+  "author": "CM_Soyza",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.13.2"
+  }
+}
