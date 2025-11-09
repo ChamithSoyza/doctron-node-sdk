@@ -13,9 +13,19 @@
     "api-client",
     "cmsoyza"
   ],
-  "author": "CM_Soyza",
+  "author": "CM_Soyza cmsoyza@gmail.com",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ChamithSoyza/doctron-node-sdk"
+  },
   "dependencies": {
     "axios": "^1.13.2"
+  },
+   "devDependencies": {
+    "eslint": "^8.50.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }
