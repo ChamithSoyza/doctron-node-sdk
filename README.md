@@ -1,2 +1,388 @@
-# doctron-node-sdk
-Node.js SDK for Docstron PDF Generation API
+# Docstron SDK for Node.js
+
+[![npm version](https://img.shields.io/npm/v/docstron.svg)](https://www.npmjs.com/package/docstron)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+The official Node.js library for the [Docstron](https://docstron.com) PDF Generation API.
+
+> **Current Version: v0.1.0 - Template Management**  
+> This is an early release focused on template operations. Document generation coming in v0.2.0!
+
+## 📋 What's Included in v0.1.0
+
+✅ **Template Management**
+- Create templates with HTML content
+- Get template details
+- Update existing templates
+- Delete templates
+- List all templates
+
+🚧 **Coming Soon**
+- v0.2.0: Document generation (PDF creation from templates)
+- v0.3.0: Application management
+- v1.0.0: Full feature set with comprehensive testing
+
+## Installation
+```bash
+npm install docstron
+```
+
+## Quick Start
+```javascript
+const Docstron = require('docstron');
+
+// Initialize the client
+const client = new Docstron('your-api-key-here');
+
+// Create a template
+const template = await client.templates.create({
+  application_id: 'app-xxx',
+  name: 'Invoice Template',
+  content: '<h1>Invoice #{{invoice_number}}</h1><p>Total: {{total}}</p>',
+  is_active: true
+});
+
+console.log('Template created:', template.template_id);
+```
+
+## Authentication
+
+Get your API key from your [Docstron Dashboard](https://docstron.com/dashboard).
+```javascript
+const client = new Docstron('your-api-key-here');
+
+// With custom options
+const client = new Docstron('your-api-key-here', {
+  baseURL: 'https://custom-api.docstron.com'
+});
+```
+
+## API Reference
+
+### Templates
+
+#### `templates.create(params)`
+
+Create a new PDF template.
+
+**Parameters:**
+- `application_id` (string, required) - Your application ID
+- `name` (string, required) - Template name
+- `content` (string, required) - HTML content with `{{placeholders}}`
+- `is_active` (boolean, optional) - Active status (default: `true`)
+- `extra_css` (string, optional) - Additional CSS rules for PDF styling
+
+**Returns:** Promise<Template>
+
+**Example:**
+```javascript
+const template = await client.templates.create({
+  application_id: 'app-7b4d78fb-820c-4ca9-84cc-46953f211234',
+  name: 'Invoice Template',
+  content: `
+    <html>
+      <body>
+        <h1>Invoice</h1>
+        <p>Customer: {{customer_name}}</p>
+        <p>Total: {{total_amount}}</p>
+      </body>
+    </html>
+  `,
+  is_active: true,
+  extra_css: '@page { margin: 2cm; }'
+});
+```
+
+#### `templates.get(templateId)`
+
+Retrieve a specific template by ID.
+
+**Parameters:**
+- `templateId` (string, required) - The template ID
+
+**Returns:** Promise<Template>
+
+**Example:**
+```javascript
+const template = await client.templates.get('template-xxx');
+console.log(template.name);
+```
+
+#### `templates.update(templateId, params)`
+
+Update an existing template.
+
+**Parameters:**
+- `templateId` (string, required) - The template ID
+- `params` (object, required) - Fields to update
+
+**Returns:** Promise<Template>
+
+**Example:**
+```javascript
+const updated = await client.templates.update('template-xxx', {
+  name: 'Updated Invoice Template',
+  is_active: false
+});
+```
+
+#### `templates.delete(templateId)`
+
+Delete a template.
+
+**Parameters:**
+- `templateId` (string, required) - The template ID
+
+**Returns:** Promise<Object>
+
+**Example:**
+```javascript
+await client.templates.delete('template-xxx');
+console.log('Template deleted');
+```
+
+#### `templates.list(applicationId)`
+
+List all templates for an application.
+
+**Parameters:**
+- `applicationId` (string, required) - The application ID
+
+**Returns:** Promise<Array<Template>>
+
+**Example:**
+```javascript
+const templates = await client.templates.list('app-xxx');
+console.log(`Found ${templates.length} templates`);
+```
+
+## Template Placeholders
+
+Use double curly braces to create dynamic placeholders:
+```html
+<h1>Hello {{customer_name}}!</h1>
+<p>Order #{{order_number}} - Total: {{total_amount}}</p>
+<p>Date: {{order_date}}</p>
+```
+
+When generating PDFs (coming in v0.2.0), you'll pass data to fill these placeholders:
+```javascript
+// Coming in v0.2.0
+{
+  customer_name: "John Doe",
+  order_number: "12345",
+  total_amount: "$299.00",
+  order_date: "2025-11-08"
+}
+```
+
+## Error Handling
+
+The SDK provides specific error types for better error handling:
+```javascript
+const {
+  DocstronError,
+  ValidationError,
+  AuthenticationError,
+  NotFoundError
+} = require('docstron');
+
+try {
+  await client.templates.create({...});
+} catch (error) {
+  if (error instanceof ValidationError) {
+    console.error('Validation failed:');
+    error.errors.forEach(err => {
+      console.error(`- ${err.field}: ${err.message}`);
+    });
+  } else if (error instanceof AuthenticationError) {
+    console.error('Invalid API key');
+  } else if (error instanceof NotFoundError) {
+    console.error('Template or application not found');
+  } else if (error instanceof DocstronError) {
+    console.error('API error:', error.message);
+  } else {
+    console.error('Unexpected error:', error);
+  }
+}
+```
+
+## Examples
+
+Check out the [examples/](examples/) directory for complete working examples:
+
+### Basic Usage
+```bash
+DOCSTRON_API_KEY=your-key npm run example
+```
+
+### Create Invoice Template
+```bash
+DOCSTRON_API_KEY=your-key npm run example:invoice
+```
+
+## Development
+```bash
+# Install dependencies
+npm install
+
+# Run tests (basic validation tests)
+npm test
+
+# Run examples
+npm run example
+npm run example:invoice
+```
+
+## Requirements
+
+- Node.js >= 14.0.0
+- A Docstron account and API key
+
+## Roadmap
+
+### v0.2.0 (Coming Soon)
+- 📄 Document generation from templates
+- 🔄 Asynchronous PDF processing
+- 📥 Multiple output formats (URL, base64, binary)
+
+### v0.3.0 (Planned)
+- 🏢 Application management
+- 📊 Usage statistics
+- 🔐 Advanced authentication options
+
+### v1.0.0 (Future)
+- 🎯 Full API coverage
+- ✅ Comprehensive test suite
+- 📚 Extended documentation
+- 🔌 Webhook support
+
+## Support
+
+- 📧 Email: support@docstron.com
+- 📚 Documentation: https://docs.docstron.com
+- 🐛 Issues: https://github.com/yourusername/docstron-sdk/issues
+- 💬 Discussions: https://github.com/yourusername/docstron-sdk/discussions
+
+## Contributing
+
+Contributions are welcome! This is an early-stage project, and we'd love your help making it better.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+MIT © [Your Name]
+
+## Changelog
+
+### v0.1.0 (2025-11-08)
+- 🎉 Initial release
+- ✅ Template management (CRUD operations)
+- ✅ Error handling with custom error types
+- ✅ Basic examples and documentation
+```
+
+### 3. .gitignore
+```
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+.nyc_output/
+
+# Build
+dist/
+build/
+
+# Optional npm cache
+.npm
+
+# Optional eslint cache
+.eslintcache
+```
+
+### 4. .npmignore
+```
+# Development files
+test/
+examples/
+.vscode/
+.idea/
+
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# CI/CD
+.github/
+.travis.yml
+.gitlab-ci.yml
+
+# Documentation source
+docs/
+
+# Environment
+.env
+.env.*
+
+# Logs
+*.log
+
+# Editor files
+*.swp
+*.swo
+*~
+```
+
+### 5. LICENSE (MIT)
+```
+MIT License
+
+Copyright (c) 2025 [Your Name]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
