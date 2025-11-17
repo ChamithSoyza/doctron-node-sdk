@@ -2,17 +2,17 @@ require('dotenv').config();
 const Docstron = require('../index');
 
 async function createInvoiceTemplate() {
-    const apiKey = process.env.DOCSTRON_API_KEY || 'your-api-key-here';
-    const appId = process.env.DOCSTRON_APP_ID;
+  const apiKey = process.env.DOCSTRON_API_KEY;
+  const appId = process.env.DOCSTRON_APP_ID;
 
-    if (!apiKey || !appId) {
-        console.error('❌ Missing credentials. Please check your .env file.');
-        process.exit(1);
-    }
+  if (!apiKey || !appId) {
+    console.error('❌ Missing credentials. Please check your .env file.');
+    process.exit(1);
+  }
 
-    const client = new Docstron(apiKey);
+  const client = new Docstron(apiKey);
 
-    const invoiceHTML = `
+  const invoiceHTML = `
     <!DOCTYPE html>
     <html>
       <head>
@@ -137,13 +137,13 @@ async function createInvoiceTemplate() {
     </html>
   `;
 
-    try {
-        const template = await client.template.create({
-            application_id: appId,
-            name: 'Professional Invoice Template - ' + Date.now(),
-            contebt: invoiceHTML,
-            is_active: true,
-            extra_css: `
+  try {
+    const template = await client.templates.create({
+      application_id: appId,
+      name: 'Professional Invoice Template - ' + Date.now(),
+      content: invoiceHTML,
+      is_active: true,
+      extra_css: `
             @page{
                 margin: 2cm;
                 @bottom-center {
@@ -153,34 +153,34 @@ async function createInvoiceTemplate() {
                 }
             }
         `
-        });
-        console.log('✅ Invoice template created!');
-        console.log('Template ID:', template.template_id);
-        console.log('\nYou can now use this template to generate invoices with your data.');
-        console.log('\nExample data structure:');
-        console.log(JSON.stringify({
-            invoice_number: 'INV-2025-001',
-            invoice_date: '2025-11-08',
-            company_name: 'Acme Corporation',
-            company_address: '123 Business St, City, State 12345',
-            company_email: 'billing@acme.com',
-            customer_name: 'John Doe',
-            customer_address: '456 Customer Ave, City, State 67890',
-            customer_email: 'john@example.com',
-            item_description: 'Web Development Services',
-            item_quantity: '40 hours',
-            item_rate: '$100/hr',
-            item_amount: '$4,000.00',
-            subtotal: '$4,000.00',
-            tax_rate: '10',
-            tax_amount: '$400.00',
-            total_amount: '$4,400.00',
-            footer_text: 'Thank you for your business!'
-        }, null, 2));
+    });
+    console.log('✅ Invoice template created!');
+    console.log('Template ID:', template.template_id);
+    console.log('\nYou can now use this template to generate invoices with your data.');
+    console.log('\nExample data structure:');
+    console.log(JSON.stringify({
+      invoice_number: 'INV-2025-001',
+      invoice_date: '2025-11-08',
+      company_name: 'Acme Corporation',
+      company_address: '123 Business St, City, State 12345',
+      company_email: 'billing@acme.com',
+      customer_name: 'John Doe',
+      customer_address: '456 Customer Ave, City, State 67890',
+      customer_email: 'john@example.com',
+      item_description: 'Web Development Services',
+      item_quantity: '40 hours',
+      item_rate: '$100/hr',
+      item_amount: '$4,000.00',
+      subtotal: '$4,000.00',
+      tax_rate: '10',
+      tax_amount: '$400.00',
+      total_amount: '$4,400.00',
+      footer_text: 'Thank you for your business!'
+    }, null, 2));
 
-    } catch (error) {
-        console.error('❌ Error:', error.message);
-    }
+  } catch (error) {
+    console.error('❌ Error:', error.message);
+  }
 
 }
 
