@@ -63,12 +63,50 @@ async function runTests() {
       AuthenticationError,
       NotFoundError
     } = require('../index');
-    
+
     console.log('✅ All error classes exported:');
     console.log('   - DocstronError:', typeof DocstronError === 'function');
     console.log('   - ValidationError:', typeof ValidationError === 'function');
     console.log('   - AuthenticationError:', typeof AuthenticationError === 'function');
     console.log('   - NotFoundError:', typeof NotFoundError === 'function');
+    console.log('');
+  } catch (error) {
+    console.log('❌ Failed:', error.message, '\n');
+  }
+
+  // Test 7: Documents resource exists
+  console.log('Test 7: Documents resource exists');
+  try {
+    const client = new Docstron('test-key');
+    console.log('✅ Documents resource available:', typeof client.documents === 'object');
+    console.log('   - Has generate:', typeof client.documents.generate === 'function');
+    console.log('   - Has quickGenerate:', typeof client.documents.quickGenerate === 'function');
+    console.log('   - Has download:', typeof client.documents.download === 'function');
+    console.log('');
+  } catch (error) {
+    console.log('❌ Failed:', error.message, '\n');
+  }
+
+  // Test 8: Features check
+  console.log('Test 8: Check available features');
+  try {
+    const features = Docstron.getFeatures();
+    console.log('✅ Features:', JSON.stringify(features, null, 2));
+    console.log('');
+  } catch (error) {
+    console.log('❌ Failed:', error.message, '\n');
+  }
+
+  // Test 9: Applications resource exists
+  console.log('Test 9: Applications resource exists');
+  try {
+    const client = new Docstron('test-key');
+    console.log('✅ Applications resource available:', typeof client.applications === 'object');
+    console.log('   - Has create:', typeof client.applications.create === 'function');
+    console.log('   - Has get:', typeof client.applications.get === 'function');
+    console.log('   - Has list:', typeof client.applications.list === 'function');
+    console.log('   - Has update:', typeof client.applications.update === 'function');
+    console.log('   - Has delete:', typeof client.applications.delete === 'function');
     console.log('');
   } catch (error) {
     console.log('❌ Failed:', error.message, '\n');

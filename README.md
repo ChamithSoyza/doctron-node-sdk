@@ -251,6 +251,103 @@ Update document data.
 
 Delete a document.
 
+
+### Applications (v0.3.0+)
+
+#### `applications.create(params)`
+
+Create a new application to organize your templates and documents.
+
+**Parameters:**
+- `params.name` (string, required) - Application name
+- `params.description` (string, optional) - Application description
+- `params.is_active` (boolean, optional) - Active status (default: `true`)
+
+**Returns:** Promise<Application>
+
+**Example:**
+```javascript
+const app = await client.applications.create({
+  name: 'Invoice System',
+  description: 'Manages all customer invoices',
+  is_active: true
+});
+
+console.log('App ID:', app.app_id);
+```
+
+#### `applications.get(appId)`
+
+Get details of a specific application.
+
+**Example:**
+```javascript
+const app = await client.applications.get('app-xxx');
+console.log(app.name, app.is_active);
+```
+
+#### `applications.list()`
+
+List all applications in your account.
+
+**Example:**
+```javascript
+const apps = await client.applications.list();
+console.log(`Total applications: ${apps.length}`);
+
+apps.forEach(app => {
+  console.log(`- ${app.name} (${app.is_active ? 'Active' : 'Inactive'})`);
+});
+```
+
+#### `applications.update(appId, params)`
+
+Update an existing application.
+
+**Parameters:**
+- `appId` (string, required) - Application ID
+- `params.name` (string, optional) - New name
+- `params.description` (string, optional) - New description
+- `params.is_active` (boolean, optional) - New active status
+
+**Example:**
+```javascript
+const updated = await client.applications.update('app-xxx', {
+  name: 'Updated Invoice System',
+  is_active: false
+});
+```
+
+#### `applications.delete(appId)`
+
+Delete an application.
+
+**Example:**
+```javascript
+await client.applications.delete('app-xxx');
+console.log('Application deleted');
+```
+
+#### `applications.listActive()`
+
+Get only active applications.
+
+**Example:**
+```javascript
+const activeApps = await client.applications.listActive();
+console.log(`Active: ${activeApps.length}`);
+```
+
+#### `applications.listInactive()`
+
+Get only inactive applications.
+
+**Example:**
+```javascript
+const inactiveApps = await client.applications.listInactive();
+console.log(`Inactive: ${inactiveApps.length}`);
+```
+
 ## Response Types
 
 When generating documents, you can choose the response format:
@@ -448,15 +545,42 @@ MIT © [Your Name]
 
 ## Changelog
 
-### v0.1.0 (2025-11-08)
-- 🎉 Initial release
-- ✅ Template management (CRUD operations)
-- ✅ Error handling with custom error types
-- ✅ Basic examples and documentation
-```
+### [0.3.0] - 2025-11-17
 
-### 3. .gitignore
-```
+### Added
+- Application management (create, get, list, update, delete)
+- Filter active/inactive applications with `listActive()` and `listInactive()`
+- Complete workflow example (Application → Template → Document)
+- Application organization best practices
+
+### Examples
+- `manage-applications.js` - Full application CRUD examples
+- `complete-workflow-with-apps.js` - End-to-end workflow demonstration
+
+### Improvements
+- Updated all documentation with application examples
+- Added application organization patterns
+- Complete SDK feature set (Templates, Documents, Applications)
+
+### [0.2.0] - 2025-11-17
+
+### Added
+- Document generation from templates
+- Quick PDF generation without templates
+- Document management (get, list, update, delete)
+- PDF download functionality
+- Password protection for PDFs
+- Multiple response type support
+
+### [0.1.0] - 2025-11-17
+
+### Added
+- Initial release
+- Template management (CRUD operations)
+- Basic error handling
+
+
+
 # Dependencies
 node_modules/
 
@@ -517,6 +641,42 @@ examples/
 
 # Documentation source
 docs/
+
+## Complete Workflow Example
+
+Here's a complete example showing all features working together:
+```javascript
+const Docstron = require('docstron-sdk');
+const client = new Docstron('your-api-key');
+
+// 1. Create application
+const app = await client.applications.create({
+  name: 'My Invoice App',
+  description: 'Customer invoicing system'
+});
+
+// 2. Create template in the application
+const template = await client.templates.create({
+  application_id: app.app_id,
+  name: 'Standard Invoice',
+  content: '<h1>Invoice #{{number}}</h1><p>Total: {{total}}</p>'
+});
+
+// 3. Generate PDF from template
+const doc = await client.documents.generate(template.template_id, {
+  data: {
+    number: '12345',
+    total: '$999.00'
+  }
+});
+
+// 4. Download the PDF
+await client.documents.download(doc.document_id, './invoice.pdf');
+
+console.log('✅ Complete workflow finished!');
+```
+
+## Application Organization Best Practices
 
 # Environment
 .env
